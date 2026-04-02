@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-Day DSA LeetCode Study Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.2); } 50% { box-shadow: 0 0 20px 4px rgba(74,222,128,0.1); } }
+
+  body {
+    min-height: 100vh;
+    background: #09090b;
+    color: #e4e4e7;
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    padding: 32px 24px;
+    padding-bottom: 60px;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  .subtitle {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: #71717a;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4ade80, #facc15, #f87171);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+  }
+  .meta { color: #71717a; font-size: 13px; margin-top: 6px; }
+
+  .progress-box {
+    background: #18181b;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 0 32px;
+    border: 1px solid #27272a;
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-label { font-size: 12px; color: #a1a1aa; }
+  .progress-count { font-size: 14px; font-weight: 600; color: #4ade80; }
+  .progress-track { height: 8px; background: #27272a; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .phase-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .phase-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #e4e4e7;
+  }
+  .phase-range { font-size: 12px; color: #52525b; }
+  .phase-count { margin-left: auto; font-size: 12px; color: #52525b; }
+  .phase { margin-bottom: 32px; }
+
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+  }
+  .day-card {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .day-card:hover { border-color: #3f3f46; }
+  .day-card.selected-easy { background: #0d2818; border-color: #166534; }
+  .day-card.selected-medium { background: #1a1700; border-color: #854d0e; }
+  .day-card.selected-hard { background: #1c0a0a; border-color: #991b1b; }
+  .day-card.all-done { animation: pulseGlow 3s infinite; }
+
+  .day-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .day-num { font-size: 11px; color: #52525b; font-weight: 600; }
+  .dots { display: flex; gap: 3px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #27272a; transition: background 0.2s; }
+  .dot.done-easy { background: #4ade80; }
+  .dot.done-medium { background: #facc15; }
+  .dot.done-hard { background: #f87171; }
+
+  .day-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e4e4e7;
+    margin-bottom: 4px;
+  }
+  .day-ds { font-size: 11px; color: #71717a; }
+
+  /* Detail Panel */
+  .detail-panel {
+    animation: fadeIn 0.3s ease;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #18181b;
+    padding: 24px 24px 32px;
+    z-index: 100;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+  .detail-panel.easy { border-top: 2px solid #166534; }
+  .detail-panel.medium { border-top: 2px solid #854d0e; }
+  .detail-panel.hard { border-top: 2px solid #991b1b; }
+
+  .detail-inner { max-width: 960px; margin: 0 auto; }
+  .detail-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .detail-day { font-size: 11px; color: #52525b; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .detail-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #e4e4e7;
+  }
+  .detail-badge {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .detail-badge.easy { background: #14532d; color: #4ade80; }
+  .detail-badge.medium { background: #422006; color: #facc15; }
+  .detail-badge.hard { background: #450a0a; color: #f87171; }
+
+  .close-btn {
+    background: none;
+    border: 1px solid #27272a;
+    color: #71717a;
+    border-radius: 6px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .close-btn:hover { color: #e4e4e7; border-color: #3f3f46; }
+
+  .tip-box {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .tip-box.easy { background: #0d2818; border: 1px solid #166534; color: #4ade80; }
+  .tip-box.medium { background: #1a1700; border: 1px solid #854d0e; color: #facc15; }
+  .tip-box.hard { background: #1c0a0a; border: 1px solid #991b1b; color: #f87171; }
+
+  .problems { display: flex; flex-direction: column; gap: 8px; }
+  .problem-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: #09090b;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .problem-row.done-easy { background: #0d2818; border-color: #166534; }
+  .problem-row.done-medium { background: #1a1700; border-color: #854d0e; }
+  .problem-row.done-hard { background: #1c0a0a; border-color: #991b1b; }
+
+  .checkbox {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid #3f3f46;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: transparent; flex-shrink: 0; transition: all 0.2s;
+  }
+  .checkbox.checked { color: #09090b; }
+  .checkbox.checked.easy { border-color: #4ade80; background: #4ade80; }
+  .checkbox.checked.medium { border-color: #facc15; background: #facc15; }
+  .checkbox.checked.hard { border-color: #f87171; background: #f87171; }
+
+  .problem-name {
+    flex: 1;
+    font-size: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    color: #e4e4e7;
+  }
+  .problem-name.done { color: #71717a; text-decoration: line-through; }
+
+  .problem-link {
+    font-size: 11px;
+    color: #52525b;
+    text-decoration: none;
+    padding: 4px 10px;
+    border: 1px solid #27272a;
+    border-radius: 4px;
+    transition: color 0.2s;
+  }
+  .problem-link:hover { color: #e4e4e7; }
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script>
+const PLAN = [
+  { day:1, title:"Arrays & Hashing", difficulty:"Easy", ds:"Array, Hash Map", problems:[{name:"Two Sum",num:1},{name:"Contains Duplicate",num:217},{name:"Valid Anagram",num:242}], tip:"Master hash maps for O(1) lookups. Always consider the time-space tradeoff." },
+  { day:2, title:"Strings", difficulty:"Easy", ds:"String, Array", problems:[{name:"Valid Palindrome",num:125},{name:"Longest Common Prefix",num:14},{name:"Roman to Integer",num:13}], tip:"Two-pointer technique is your best friend for string problems." },
+  { day:3, title:"Linked List Basics", difficulty:"Easy", ds:"Singly Linked List", problems:[{name:"Reverse Linked List",num:206},{name:"Merge Two Sorted Lists",num:21},{name:"Linked List Cycle",num:141}], tip:"Draw the pointers on paper. Use dummy nodes to simplify edge cases." },
+  { day:4, title:"Stack & Queue", difficulty:"Easy", ds:"Stack, Queue", problems:[{name:"Valid Parentheses",num:20},{name:"Implement Queue using Stacks",num:232},{name:"Min Stack",num:155}], tip:"Stacks = LIFO (last in, first out). Think 'undo' operations." },
+  { day:5, title:"Binary Tree Basics", difficulty:"Easy", ds:"Binary Tree", problems:[{name:"Maximum Depth of Binary Tree",num:104},{name:"Invert Binary Tree",num:226},{name:"Same Tree",num:100}], tip:"Recursion is natural for trees. Base case = null node." },
+  { day:6, title:"Binary Search", difficulty:"Easy", ds:"Array (sorted)", problems:[{name:"Binary Search",num:704},{name:"Search Insert Position",num:35},{name:"First Bad Version",num:278}], tip:"Always clarify: is mid included or excluded? Use lo <= hi pattern." },
+  { day:7, title:"Two Pointers & Sliding Window", difficulty:"Easy", ds:"Array, String", problems:[{name:"Move Zeroes",num:283},{name:"Squares of a Sorted Array",num:977},{name:"Best Time to Buy and Sell Stock",num:121}], tip:"Sliding window = expand right, shrink left. Track a running answer." },
+  { day:8, title:"Heap & Sorting", difficulty:"Easy", ds:"Heap, Array", problems:[{name:"Kth Largest Element in a Stream",num:703},{name:"Last Stone Weight",num:1046},{name:"Sort Colors (Dutch Flag warm-up)",num:75}], tip:"Min-heap for 'kth largest', max-heap for 'kth smallest'." },
+  { day:9, title:"Graph Basics & BFS/DFS", difficulty:"Easy", ds:"Graph, Matrix", problems:[{name:"Flood Fill",num:733},{name:"Island Perimeter",num:463},{name:"Find if Path Exists in Graph",num:1971}], tip:"BFS = queue + level order. DFS = stack/recursion. Track visited!" },
+  { day:10, title:"Bit Manipulation & Math", difficulty:"Easy", ds:"Bits, Numbers", problems:[{name:"Single Number",num:136},{name:"Number of 1 Bits",num:191},{name:"Missing Number",num:268}], tip:"XOR is magic: a ^ a = 0, a ^ 0 = a. Use it to find uniques." },
+
+  { day:11, title:"Arrays & Hashing II", difficulty:"Medium", ds:"Array, Hash Map, Set", problems:[{name:"Group Anagrams",num:49},{name:"Top K Frequent Elements",num:347},{name:"Product of Array Except Self",num:238}], tip:"Prefix/suffix arrays eliminate nested loops. Think about what you can precompute." },
+  { day:12, title:"Two Pointers & Sliding Window II", difficulty:"Medium", ds:"Array, Hash Map, String", problems:[{name:"3Sum",num:15},{name:"Longest Substring Without Repeating Characters",num:3},{name:"Container With Most Water",num:11}], tip:"Sort first for multi-pointer problems. Sliding window needs clear expand/shrink conditions." },
+  { day:13, title:"Linked List Advanced", difficulty:"Medium", ds:"Linked List", problems:[{name:"Add Two Numbers",num:2},{name:"Remove Nth Node From End of List",num:19},{name:"Reorder List",num:143}], tip:"Fast/slow pointers find the middle. Combine reverse + merge for reorder." },
+  { day:14, title:"Binary Tree II — DFS Patterns", difficulty:"Medium", ds:"Binary Tree, BST", problems:[{name:"Binary Tree Level Order Traversal",num:102},{name:"Validate Binary Search Tree",num:98},{name:"Lowest Common Ancestor of a BST",num:235}], tip:"BST property: left < root < right. In-order traversal gives sorted output." },
+  { day:15, title:"Binary Search II", difficulty:"Medium", ds:"Array, Matrix", problems:[{name:"Search in Rotated Sorted Array",num:33},{name:"Find Minimum in Rotated Sorted Array",num:153},{name:"Search a 2D Matrix",num:74}], tip:"In rotated arrays, one half is always sorted. Decide which half target falls in." },
+  { day:16, title:"Graph — BFS/DFS & Islands", difficulty:"Medium", ds:"Graph, Matrix, Queue", problems:[{name:"Number of Islands",num:200},{name:"Rotting Oranges",num:994},{name:"Clone Graph",num:133}], tip:"Multi-source BFS: push all sources into queue at once. Use a hash map for cloning." },
+  { day:17, title:"Backtracking", difficulty:"Medium", ds:"Array, Recursion Tree", problems:[{name:"Subsets",num:78},{name:"Combination Sum",num:39},{name:"Permutations",num:46}], tip:"Template: choose → explore → unchoose. Control duplicates with sorting + skip." },
+  { day:18, title:"Dynamic Programming I", difficulty:"Medium", ds:"Array, DP Table", problems:[{name:"Climbing Stairs",num:70},{name:"House Robber",num:198},{name:"Coin Change",num:322}], tip:"Define the state clearly. dp[i] = answer for subproblem of size i." },
+  { day:19, title:"Dynamic Programming II", difficulty:"Medium", ds:"String, 2D DP", problems:[{name:"Longest Palindromic Substring",num:5},{name:"Longest Increasing Subsequence",num:300},{name:"Word Break",num:139}], tip:"2D DP often uses dp[i][j] for substrings s[i..j]. Draw the table!" },
+  { day:20, title:"Trie, Heap & Intervals", difficulty:"Medium", ds:"Trie, Heap, Interval", problems:[{name:"Implement Trie (Prefix Tree)",num:208},{name:"Task Scheduler",num:621},{name:"Merge Intervals",num:56}], tip:"Tries = prefix matching. For intervals: sort by start, merge greedily." },
+
+  { day:21, title:"Sliding Window — Hard", difficulty:"Hard", ds:"Hash Map, Deque", problems:[{name:"Minimum Window Substring",num:76},{name:"Sliding Window Maximum",num:239}], tip:"Use a frequency map + valid counter. Monotonic deque keeps window max in O(1)." },
+  { day:22, title:"Linked List & Merge — Hard", difficulty:"Hard", ds:"Linked List, Heap", problems:[{name:"Merge k Sorted Lists",num:23},{name:"Reverse Nodes in k-Group",num:25}], tip:"Min-heap merges k lists in O(N log k). Reverse in groups with careful pointer management." },
+  { day:23, title:"Binary Tree — Hard", difficulty:"Hard", ds:"Binary Tree, Serialization", problems:[{name:"Binary Tree Maximum Path Sum",num:124},{name:"Serialize and Deserialize Binary Tree",num:297}], tip:"Global variable tracks the answer. Each recursion returns the single-path sum." },
+  { day:24, title:"Graph — Advanced", difficulty:"Hard", ds:"Graph, Topological Sort, Union Find", problems:[{name:"Course Schedule II",num:210},{name:"Alien Dictionary",num:269}], tip:"Topological sort = BFS with in-degree tracking (Kahn's algorithm)." },
+  { day:25, title:"Dynamic Programming — Hard", difficulty:"Hard", ds:"2D DP, Bitmask DP", problems:[{name:"Edit Distance",num:72},{name:"Longest Valid Parentheses",num:32}], tip:"Edit distance: dp[i][j] = min ops to convert s[0..i] to t[0..j]. Classic 2D DP." },
+  { day:26, title:"Backtracking — Hard", difficulty:"Hard", ds:"Matrix, Recursion, Constraints", problems:[{name:"N-Queens",num:51},{name:"Sudoku Solver",num:37}], tip:"Constraint propagation + pruning makes brute force feasible. Use sets for fast conflict checks." },
+  { day:27, title:"Stack & Monotonic Patterns", difficulty:"Hard", ds:"Stack, Array", problems:[{name:"Largest Rectangle in Histogram",num:84},{name:"Trapping Rain Water",num:42}], tip:"Monotonic stack finds 'next greater/smaller' in O(n). Stack stores indices, not values." },
+  { day:28, title:"Heap & Median Tracking", difficulty:"Hard", ds:"Two Heaps, Sorted Set", problems:[{name:"Find Median from Data Stream",num:295},{name:"IPO",num:502}], tip:"Two heaps (max-heap for lower half, min-heap for upper half) maintain running median." },
+  { day:29, title:"Segment Tree & Advanced DS", difficulty:"Hard", ds:"Segment Tree, BIT, Ordered Set", problems:[{name:"Count of Smaller Numbers After Self",num:315},{name:"Range Sum Query - Mutable",num:307}], tip:"Segment tree = divide-and-conquer on array ranges. Build O(n), query/update O(log n)." },
+  { day:30, title:"Grand Finale — Mixed Hard", difficulty:"Hard", ds:"DP, Graph, Design", problems:[{name:"Word Ladder",num:127},{name:"Regular Expression Matching",num:10},{name:"LRU Cache",num:146}], tip:"BFS for shortest transformation. DP for regex. Hash Map + Doubly Linked List for LRU." },
+];
+
+const diffClass = { Easy: "easy", Medium: "medium", Hard: "hard" };
+const phases = [
+  { label: "Foundation", range: "Days 1–10", diff: "Easy", days: PLAN.slice(0, 10) },
+  { label: "Build-Up", range: "Days 11–20", diff: "Medium", days: PLAN.slice(10, 20) },
+  { label: "Mastery", range: "Days 21–30", diff: "Hard", days: PLAN.slice(20, 30) },
+];
+
+// Load/save progress to localStorage
+let completed = JSON.parse(localStorage.getItem("dsa30_progress") || "{}");
+function saveProgress() { localStorage.setItem("dsa30_progress", JSON.stringify(completed)); }
+
+let selectedDay = null;
+
+function slugify(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function totalProblems() { return PLAN.reduce((s, d) => s + d.problems.length, 0); }
+function completedCount() { return Object.values(completed).filter(Boolean).length; }
+
+function render() {
+  const total = totalProblems();
+  const done = completedCount();
+  const pct = Math.round((done / total) * 100);
+  const barColor = pct < 34 ? "#4ade80" : pct < 67 ? "#facc15" : "#f87171";
+
+  let html = `
+    <div class="subtitle">30-Day Challenge</div>
+    <h1>DSA LeetCode Study Plan</h1>
+    <p class="meta">${total} problems · Arrays → Trees → Graphs → DP → Advanced DS</p>
+
+    <div class="progress-box">
+      <div class="progress-header">
+        <span class="progress-label">PROGRESS</span>
+        <span class="progress-count">${done}/${total} solved · ${pct}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%;background:${barColor}"></div>
+      </div>
+    </div>
+  `;
+
+  phases.forEach(phase => {
+    const dc = diffClass[phase.diff];
+    const phaseTotal = phase.days.reduce((s, d) => s + d.problems.length, 0);
+    const phaseDone = phase.days.reduce((s, d) => s + d.problems.filter((_, i) => completed[`${d.day-1}-${i}`]).length, 0);
+
+    html += `<div class="phase">
+      <div class="phase-header">
+        <div class="phase-badge" style="background:var(--badge-${dc});color:var(--text-${dc})">${phase.diff}</div>
+        <span class="phase-title">${phase.label}</span>
+        <span class="phase-range">${phase.range}</span>
+        <span class="phase-count">${phaseDone}/${phaseTotal}</span>
+      </div>
+      <div class="day-grid">`;
+
+    phase.days.forEach(day => {
+      const dayIdx = day.day - 1;
+      const isSelected = selectedDay === dayIdx;
+      const dayDone = day.problems.filter((_, i) => completed[`${dayIdx}-${i}`]).length;
+      const allDone = dayDone === day.problems.length;
+      const selClass = isSelected ? ` selected-${dc}` : "";
+      const doneClass = allDone ? " all-done" : "";
+
+      let dots = "";
+      day.problems.forEach((_, i) => {
+        const dotDone = completed[`${dayIdx}-${i}`] ? ` done-${dc}` : "";
+        dots += `<div class="dot${dotDone}"></div>`;
+      });
+
+      html += `
+        <div class="day-card${selClass}${doneClass}" onclick="selectDay(${dayIdx})">
+          <div class="day-top">
+            <span class="day-num">DAY ${day.day}</span>
+            <div class="dots">${dots}</div>
+          </div>
+          <div class="day-title">${day.title}</div>
+          <div class="day-ds">${day.ds}</div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  // Detail panel
+  if (selectedDay !== null) {
+    const day = PLAN[selectedDay];
+    const dc = diffClass[day.difficulty];
+
+    let problemsHtml = "";
+    day.problems.forEach((p, i) => {
+      const key = `${selectedDay}-${i}`;
+      const isDone = completed[key];
+      const rowClass = isDone ? ` done-${dc}` : "";
+      const cbClass = isDone ? ` checked ${dc}` : "";
+      const nameClass = isDone ? " done" : "";
+      const slug = slugify(p.name);
+
+      problemsHtml += `
+        <div class="problem-row${rowClass}" onclick="toggleProblem(${selectedDay},${i})">
+          <div class="checkbox${cbClass}">✓</div>
+          <span class="problem-name${nameClass}">${p.name}</span>
+          <a class="problem-link" href="https://leetcode.com/problems/${slug}/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">#${p.num} →</a>
+        </div>`;
+    });
+
+    html += `
+      <div class="detail-panel ${dc}">
+        <div class="detail-inner">
+          <div class="detail-top">
+            <div>
+              <div class="detail-day">DAY ${day.day}</div>
+              <div class="detail-title">${day.title}</div>
+              <span class="detail-badge ${dc}">${day.difficulty}</span>
+            </div>
+            <button class="close-btn" onclick="selectDay(null)">✕ Close</button>
+          </div>
+          <div class="tip-box ${dc}">💡 ${day.tip}</div>
+          <div class="problems">${problemsHtml}</div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById("app").innerHTML = html;
+}
+
+function selectDay(idx) {
+  selectedDay = selectedDay === idx ? null : idx;
+  render();
+}
+
+function toggleProblem(dayIdx, probIdx) {
+  const key = `${dayIdx}-${probIdx}`;
+  completed[key] = !completed[key];
+  saveProgress();
+  render();
+}
+
+// CSS variables for dynamic badge colors
+document.head.insertAdjacentHTML("beforeend", `<style>
+  :root {
+    --badge-easy: #14532d; --text-easy: #4ade80;
+    --badge-medium: #422006; --text-medium: #facc15;
+    --badge-hard: #450a0a; --text-hard: #f87171;
+  }
+</style>`);
+
+render();
+</script>
+</body>
+</html>
